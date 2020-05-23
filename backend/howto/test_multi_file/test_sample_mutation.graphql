@@ -1,8 +1,8 @@
-type Query{
+extend type Query{
     none: Boolean
 }
 
-type Mutation{
-    testOne(argOne: String!): Boolean
+extend type Mutation{
+    testOne: Boolean
 }
 

@@ -108,8 +108,10 @@ def resolve_client(obj, info):
     return "client"
 
 
-schema = make_executable_schema(type_defs, mutation, query, user, client,
-                                snake_case_fallback_resolvers, subscription)
+from backend.howto.test_multi_file.main import test_type_defs, make_mutation_parent
+
+schema = make_executable_schema([type_defs, test_type_defs], mutation, query, user, client,
+                                snake_case_fallback_resolvers, subscription, make_mutation_parent)
 
 # Create executable schema instance
 
@@ -141,3 +143,6 @@ if __name__ == "__main__":
 
 # TODO Database Stuff:
 # https://www.encode.io/databases/
+
+# TODO: Auth
+# https://spectrum.chat/ariadne/general/how-to-implement-a-very-simple-auth-layer~80b7d221-6d0c-4df8-800a-e4cc6a07c99d
