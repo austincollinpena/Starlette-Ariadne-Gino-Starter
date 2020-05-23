@@ -1,0 +1,21 @@
+type Mutation{
+    login(username: String!, password: String!): Boolean!
+    logout: Boolean!
+    test(argOne: String, argTwo: Boolean): Boolean!
+}
+
+type Query {
+    hello: String!
+    user: User
+    holidays(year: Int): [String]!
+    client: Client
+}
+type User {
+    username: String!
+    email: String!
+    firstName: String!
+    lastName: String!
+}
+type Client {
+    email: String!
+}
