@@ -1,12 +1,16 @@
+import asyncio
+
 from ariadne import gql
 
-from ariadne import QueryType, make_executable_schema, ObjectType, snake_case_fallback_resolvers, load_schema_from_path
+from ariadne import QueryType, make_executable_schema, ObjectType, snake_case_fallback_resolvers, load_schema_from_path, \
+    SubscriptionType
 from ariadne.asgi import GraphQL
 from starlette.applications import Starlette
+from ariadne.contrib.tracing.apollotracing import ApolloTracingExtension
 
 from ariadne import MutationType
 from backend import auth_mutation
-from backend.howto.multi_file_mutation.functions import make_mutation
+from backend.howto.multi_file_mutation.functions import make_mutation as the_real_deal
 
 # For debugging:
 import uvicorn
@@ -17,23 +21,28 @@ import os
 # Define the type definitions
 from backend.howto.multi_file_mutation.main import make_mutation_parent
 
-type_defstwo = gql("""
-    type Query {
-        hello: String!
-        user: User
-        holidays(year: Int): [String]!
-        client: Client
-    }
-    type User {
-       username: String! 
-       email: String!
-       firstName: String!
-       lastName: String!
-    }
-    type Client {
-        email: String!
-    }
-""")
+subscription = SubscriptionType()
+
+
+@subscription.source("counter")
+async def counter_generator(obj, info):
+    for i in range(5):
+        await asyncio.sleep(1)
+        yield i
+
+
+@subscription.field("counter")
+def counter_resolver(count, info):
+    return count + 1
+
+
+async def show_off_mutation(_, info, argOne):
+    return {"success": True, "message": "zoo wee mama"}
+
+
+async def show_test_input(_, info, input):
+    return True
+
 
 type_defs = load_schema_from_path("./backend/.graphql")
 
@@ -42,7 +51,14 @@ query = QueryType()
 mutation = MutationType()
 mutation.set_field("login", auth_mutation.resolve_login)
 mutation.set_field("logout", auth_mutation.resolve_logout)
-mutation.set_field("test", make_mutation)
+mutation.set_field("test", show_off_mutation)
+mutation.set_field("sampleTwo", show_test_input)
+
+
+@mutation.field("nest")
+def tester(*_):
+    a = 1
+    return True
 
 
 @query.field("holidays")
@@ -93,7 +109,7 @@ def resolve_client(obj, info):
 
 
 schema = make_executable_schema(type_defs, mutation, query, user, client,
-                                snake_case_fallback_resolvers)
+                                snake_case_fallback_resolvers, subscription)
 
 # Create executable schema instance
 
@@ -101,10 +117,10 @@ schema = make_executable_schema(type_defs, mutation, query, user, client,
 # make_executable_schema(type_defs, [query, user, mutations, fallback_resolvers])
 
 # Make the graphql server
-graphql_server = GraphQL(schema)
+graphql_server = GraphQL(schema, debug=True, extensions=[ApolloTracingExtension], )
 
 app = Starlette(debug=True)
-app.mount("/graphql", GraphQL(schema, debug=True))
+app.mount("/graphql", GraphQL(schema, debug=True, extensions=[ApolloTracingExtension]))
 
 # For debugging
 if __name__ == "__main__":
@@ -122,3 +138,6 @@ if __name__ == "__main__":
 
 # Other resources
 # https://perandrestromhaug.com/posts/guide-to-schema-first-graphql-with-django-and-ariadne/
+
+# TODO Database Stuff:
+# https://www.encode.io/databases/
