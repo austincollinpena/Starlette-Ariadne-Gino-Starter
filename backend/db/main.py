@@ -1,8 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from .. import config
+from gino_starlette import Gino
 
-DATABASE_URL = 'postgresql://text:text@localhost:5432/textdatabase'
+db = Gino(dsn=config.DB_DSN)
 
-engine = create_engine(DATABASE_URL)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

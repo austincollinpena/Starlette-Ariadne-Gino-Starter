@@ -2,7 +2,18 @@ Generic single-database configuration.
 1. Start with alembic init alembic
 
 2. Update the path of the parent dir. Assuming your application directory is one level down it is this:
+import sys
+import os
 parent_dir = os.path.abspath(os.path.join(os.getcwd(), ".."))
 sys.path.append(parent_dir)
 
-3. Import your Base metadata, and add it to the target metadata of the env.py
+3. Import your Base metadata and models into one file, and add it to the target metadata of the env.py
+sample: db.base.py
+
+4. Run auto migrations:
+
+alembic revision --autogenerate -m "add root_cause table"
+
+5. Run migrations:
+
+alembic upgrade head
