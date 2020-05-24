@@ -8,6 +8,10 @@ from alembic import context
 import sys
 import os
 
+parent_dir = os.path.abspath(os.path.join(os.getcwd(), ".."))
+sys.path.append(parent_dir)
+# os.chdir(os.path.join(os.getcwd(), ".."))
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -16,14 +20,10 @@ config = context.config
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
-# for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
-parent_dir = os.path.abspath(os.path.join(os.getcwd(), ".."))
-sys.path.append(parent_dir)
-from backend.db.base import Base
-target_metadata = Base.metadata
+from backend.db import db as gino_db
+
+target_metadata = gino_db
+
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -62,11 +62,22 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    from backend.config import MIGRATION_URL
+    # https://stackoverflow.com/a/15668175/12563520
+    alembic_config = config.get_section(config.config_ini_section)
+    alembic_config['sqlalchemy.url'] = MIGRATION_URL
+    engine = engine_from_config(
+        alembic_config,
+        prefix='sqlalchemy.',
+        poolclass=pool.NullPool)
+
+    connectable = engine
+
+    # connectable = engine_from_config(
+    #     config.get_section(config.config_ini_section),
+    #     prefix="sqlalchemy.",
+    #     poolclass=pool.NullPool,
+    # )
 
     with connectable.connect() as connection:
         context.configure(

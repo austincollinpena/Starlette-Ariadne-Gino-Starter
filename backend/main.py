@@ -3,7 +3,7 @@ from ariadne.asgi import GraphQL
 from starlette.applications import Starlette
 from ariadne.contrib.tracing.apollotracing import ApolloTracingExtension
 
-from backend.db.main import db as gino_db
+from backend.db import db as gino_db
 
 # For debugging:
 import uvicorn
@@ -14,8 +14,27 @@ from backend.utils.graphql import root_graphql_types
 
 schema = make_executable_schema([*root_graphql_types, get_user_type_defs], root_query)
 
+import logging
+from importlib_metadata import entry_points
+
+logger = logging.getLogger(__name__)
+
+
+def load_modules(app=None):
+    a = entry_points()
+    a
+    for ep in entry_points()["backend"]:
+        logger.info("Loading module: %s", ep.name)
+        mod = ep.load()
+        if app:
+            init_app = getattr(mod, "init_app", None)
+            if init_app:
+                init_app(app)
+
+
 app = Starlette(debug=True)
 gino_db.init_app(app)
+# load_modules(app)
 
 app.mount("/graphql", GraphQL(schema, debug=True, extensions=[ApolloTracingExtension]))
 

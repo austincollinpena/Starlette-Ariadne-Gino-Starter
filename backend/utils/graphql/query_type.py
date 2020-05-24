@@ -2,4 +2,5 @@
 from ariadne import QueryType
 
 query = QueryType()
-from backend.users.queries.get_user import resolve_get_user
+# from backend.users.queries.get_user import resolve_get_user
+# from backend.users.queries import *

@@ -1,8 +1,17 @@
 from sqlalchemy.engine.url import URL, make_url
 from starlette.config import Config
 from starlette.datastructures import Secret
+import os
 
-config = Config("./backend/.env")
+print(os.getcwd())
+
+config = Config("backend/.env")
+try:
+    config('MIGRATION_URL')
+except:
+    config = Config(".env")
+
+MIGRATION_URL = config("MIGRATION_URL", default="You forgot the migration url")
 
 DB_DRIVER = config("DB_DRIVER", default="asyncpg")
 DB_HOST = config("DB_HOST", default=None)
@@ -22,6 +31,8 @@ DB_DSN = config(
         database=DB_DATABASE,
     ),
 )
+print('IM THE DB_DSN')
+print(DB_DSN)
 DB_POOL_MIN_SIZE = config("DB_POOL_MIN_SIZE", cast=int, default=1)
 DB_POOL_MAX_SIZE = config("DB_POOL_MAX_SIZE", cast=int, default=16)
 DB_ECHO = config("DB_ECHO", cast=bool, default=False)
