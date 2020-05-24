@@ -2,11 +2,11 @@
 
 This is heavily a WIP. The goal is to present it to the community and get feedback.
 
-#### Motivation
+## Motivation
 
 Build a completely async python graphql server with built in Auth. If you're looking for a very polished implementation of Ariadne, check out [this repo](https://gitlab.com/heathercreech/demmy/-/tree/version-2/server#faq-for-those-using-this-repo-as-a-reference-for-ariadne).
 
-#### Components:
+## Components:
 
 1. Starlette Server
 2. Ariadne Graphql Server
@@ -14,7 +14,7 @@ Build a completely async python graphql server with built in Auth. If you're loo
 3. Alembic database migration handler
 4. Asyncpg database driver
 
-#### How To's
+## How To's
 
 **Start The Server**
 
@@ -28,7 +28,7 @@ Run: ```alembic revision --autogenerate -m "Added initial table"``` to generate 
 
 And then: ```alembic upgrade head``` to apply them
 
-####How The Apps Work
+##How The Apps Work
 
 This starter follows the same conventions as Django where apps are seperated into their own components for organization's sake. Each app inherits types from the utils/graphql folder which are then used to create mutations/queries.
 
