@@ -1,0 +1,139 @@
+**Note**
+
+This is heavily a WIP. The goal is to present it to the community and get feedback.
+
+#### Motivation
+
+Build a completely async python graphql server with built in Auth. If you're looking for a very polished implementation of Ariadne, check out [this repo](https://gitlab.com/heathercreech/demmy/-/tree/version-2/server#faq-for-those-using-this-repo-as-a-reference-for-ariadne).
+
+#### Components:
+
+1. Starlette Server
+2. Ariadne Graphql Server
+2. Gino Async wrapper for sqlalchemy
+3. Alembic database migration handler
+4. Asyncpg database driver
+
+#### How To's
+
+**Start The Server**
+
+From the root directory, run ```uvicorn backend.main:app --reload```
+
+**Make Migrations**
+
+This has to be done from the ./backend folder where the ```alembic.ini``` file exists.
+
+Run: ```alembic revision --autogenerate -m "Added initial table"``` to generate the migrations.
+
+And then: ```alembic upgrade head``` to apply them
+
+####How The Apps Work
+
+This starter follows the same conventions as Django where apps are seperated into their own components for organization's sake. Each app inherits types from the utils/graphql folder which are then used to create mutations/queries.
+
+**Adding a new query**
+
+For example, each new added query needs to do the following:
+
+1. Define the new query in a .graphql file with the ```extend type Query``` syntax
+2. Import the root query into the file with the resolver 
+3. Wrap the resolver around the query:
+
+```graphql
+# Graphql typedefs file
+extend type Query{
+    getUser: Boolean
+}
+```
+
+```python
+# Resolver File
+from backend.utils.graphql.query_type import query
+@query.field("getUser")
+async def resolve_get_user(obj, info):
+    return False
+```
+
+**Adding a new mutation, type, subscription, or other**
+
+The convention is to define the root class, like the ```type Mutation``` in the ```utils/graphql``` folder, which makes adding new resolvers really easy. 
+
+**How The Graphql Server Knows About Type Defs**
+
+Because there is only one query attached to the server, we need to import all of our schema and resolvers to the root.
+
+To keep things organized, we can see four entry points of interest for our sample app for type defs:
+```
+/app
+__init__.py (Exports the collection of all the type defs)
+
+- /queries
+   __init__.py (makes a list of all the query schemas)
+
+- /mutations
+   __init__.py (makes a list of all the mutation schemas)
+
+- /types
+   __init__.py (makes a list of all the types schemas)
+```
+
+Inside of our ```queries/__init__.py``` we load all of the ```.graphql``` files as below. ([docs link](https://ariadnegraphql.org/docs/modularization))
+
+```python
+from ariadne import load_schema_from_path
+import os
+user_query_schema = load_schema_from_path(
+    os.path.join(os.getcwd(), "backend/users/queries"))
+```
+This process is repeated across the ```mutations``` and ```types``` folders.
+
+Then, in the ```/app```'s ```___init__.py```, they are all collected and put in a list.
+
+```python
+# TODO: Add the .mutations
+from .queries import user_query_schema
+from .types import user_type_schema
+
+user_type_defs = [user_query_schema, user_type_schema]
+```
+
+Finally, in the ```main.py```, we can put it all together in the following generic format. ([docs link](https://ariadnegraphql.org/docs/intro#making-executable-schema))
+
+```python
+schema = make_executable_schema([*list_of_type_defs, *other_list_of_type_defs], query, mutation, subscription)
+```
+
+In our example, that looks like this:
+
+```python
+from ariadne import make_executable_schema
+
+from backend.utils.graphql.query_type import query as root_query
+from backend.utils.graphql.mutation_type import mutation as root_mutation
+from backend.utils.graphql import root_graphql_types
+from backend.users import user_type_defs
+
+schema = make_executable_schema([*root_graphql_types, *user_type_defs], root_query, root_mutation)
+```
+
+**Binding Resolvers**
+
+There are two steps to binding the resolvers, and we've already seen one, the decorator ([more ways here](https://ariadnegraphql.org/docs/resolvers))
+```python
+from backend.utils.graphql.query_type import query
+@query.field("getUser")
+async def resolve_get_user(obj, info):
+...
+```
+
+However, to have this _actually_ get picked up by the Query, we need to export our resolvers from the ```__init__.py``` of each folder containing resolvers like so (of course you could also export each function individually as well).
+
+```python
+from os.path import dirname, basename, isfile, join
+import glob
+modules = glob.glob(join(dirname(__file__), "*.py"))
+__all__ = [basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__init__.py')]
+```
+
+

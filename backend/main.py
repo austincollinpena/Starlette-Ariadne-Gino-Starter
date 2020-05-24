@@ -8,29 +8,13 @@ from backend.db import db as gino_db
 # For debugging:
 import uvicorn
 
-from backend.users.queries import get_user_type_defs
+from backend.users.queries import user_query_schema
 from backend.utils.graphql.query_type import query as root_query
+from backend.utils.graphql.mutation_type import mutation as root_mutation
 from backend.utils.graphql import root_graphql_types
+from backend.users import user_type_defs
 
-schema = make_executable_schema([*root_graphql_types, get_user_type_defs], root_query)
-
-import logging
-from importlib_metadata import entry_points
-
-logger = logging.getLogger(__name__)
-
-
-def load_modules(app=None):
-    a = entry_points()
-    a
-    for ep in entry_points()["backend"]:
-        logger.info("Loading module: %s", ep.name)
-        mod = ep.load()
-        if app:
-            init_app = getattr(mod, "init_app", None)
-            if init_app:
-                init_app(app)
-
+schema = make_executable_schema([*root_graphql_types, *user_type_defs], root_query, root_mutation)
 
 app = Starlette(debug=True)
 gino_db.init_app(app)
