@@ -3,14 +3,11 @@ from starlette.config import Config
 from starlette.datastructures import Secret
 import os
 
-print('CWD-----------------------')
-print(os.getcwd())
-
 config = Config("backend/.env")
-try:
-    config('MIGRATION_URL')
-except:
-    config = Config(".env")
+# try:
+#     config('MIGRATION_URL')
+# except:
+#     config = Config(".env")
 
 MIGRATION_URL = config("MIGRATION_URL", default="You forgot the migration url")
 

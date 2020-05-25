@@ -22,11 +22,20 @@ From the root directory, run ```uvicorn backend.main:app --reload```
 
 **Make Migrations**
 
-This has to be done from the ./backend folder where the ```alembic.ini``` file exists.
+This has to be done from the root folder where the ```alembic.ini``` file exists.
 
 Run: ```alembic revision --autogenerate -m "Added initial table"``` to generate the migrations.
 
-And then: ```alembic upgrade head``` to apply them
+And then: ```alembic upgrade head``` to apply them.
+
+Alembic has well know issues with knowing the Python path. This was solved through moving the ```alembic.ini``` file from the ```./backend``` folder to the root folder, and adding the following line to the .ini:
+
+```python
+current_dir = os.path.abspath(os.path.join(os.getcwd()))
+sys.path.append(current_dir)
+```
+
+Finally, the last bit of "magic" applied is to ensure that the DB URL specified in the .env file is used during online migrations. This function can be found in ./alembic/env.py 
 
 ##How The Apps Work
 
@@ -145,3 +154,8 @@ Gino is a wrapper around SQLAlchemy core, allowing for asynchronous actions.
 3. Loading relationships via models loaders [are here](https://python-gino.org/docs/en/master/how-to/loaders.html).
 
 TODO: ondelete=Cascade?
+
+## Setting Up The environment
+
+1. Run a pip install
+2. Fill out the ```env``` file with variables included for convenience. Just change it from ```env``` to ```.env``` (This of course requires a postgres server up and running)

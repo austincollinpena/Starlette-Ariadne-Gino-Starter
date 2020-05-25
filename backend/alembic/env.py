@@ -8,14 +8,8 @@ from alembic import context
 import sys
 import os
 
-parent_dir = os.path.abspath(os.path.join(os.getcwd(), ".."))
-sys.path.append(parent_dir)
-print('appended--------------------')
-print(parent_dir)
-# print('appended x2--------------------')
-# current_dir = os.path.abspath(os.path.join(os.getcwd()))
-# sys.path.append(current_dir)
-# print(current_dir)
+current_dir = os.path.abspath(os.path.join(os.getcwd()))
+sys.path.append(current_dir)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
