@@ -3,7 +3,7 @@
   <database-model serializer="dbm" dbms="POSTGRES" family-id="POSTGRES" format-version="4.17">
     <root id="1">
       <ServerVersion>12.1</ServerVersion>
-      <StartupTime>1590330309</StartupTime>
+      <StartupTime>1590381802</StartupTime>
     </root>
     <database id="2" parent="1" name="booktime">
       <ObjectId>16394</ObjectId>
@@ -29,8 +29,11 @@
     <database id="7" parent="1" name="textdatabase">
       <ObjectId>20816</ObjectId>
       <Owner>text</Owner>
-      <IntrospectionStateNumber>1664</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1669</IntrospectionStateNumber>
       <Current>1</Current>
+      <Relations>sequence|table|29046|29048|1
+sequence|table|29057|29059|1
+</Relations>
     </database>
     <role id="8" parent="1" name="booktime">
       <ObjectId>16393</ObjectId>
@@ -98,7 +101,7 @@
       <Comment>standard public schema</Comment>
       <StateNumber>276</StateNumber>
       <Owner>postgres</Owner>
-      <IntrospectionStateNumber>1665</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1670</IntrospectionStateNumber>
       <Current>1</Current>
     </schema>
     <access-method id="24" parent="7" name="heap">
@@ -164,31 +167,139 @@
       <SchemaName>pg_catalog</SchemaName>
       <SchemaId>11</SchemaId>
     </extension>
-    <table id="32" parent="23" name="alembic_version">
+    <sequence id="32" parent="23" name="profiles_id_seq">
+      <ObjectId>29057</ObjectId>
+      <StateNumber>1666</StateNumber>
+      <Owner>text</Owner>
+      <SequenceIdentity>1</SequenceIdentity>
+      <CacheSize>1</CacheSize>
+      <DataType>integer</DataType>
+    </sequence>
+    <sequence id="33" parent="23" name="users_id_seq">
+      <ObjectId>29046</ObjectId>
+      <StateNumber>1666</StateNumber>
+      <Owner>text</Owner>
+      <SequenceIdentity>1</SequenceIdentity>
+      <CacheSize>1</CacheSize>
+      <DataType>integer</DataType>
+    </sequence>
+    <table id="34" parent="23" name="alembic_version">
       <ObjectId>29041</ObjectId>
       <Owner>text</Owner>
       <StateNumber>1660</StateNumber>
     </table>
-    <column id="33" parent="32" name="version_num">
+    <table id="35" parent="23" name="profiles">
+      <ObjectId>29059</ObjectId>
+      <Owner>text</Owner>
+      <StateNumber>1666</StateNumber>
+    </table>
+    <table id="36" parent="23" name="users">
+      <ObjectId>29048</ObjectId>
+      <Outdated>1</Outdated>
+      <Owner>text</Owner>
+      <StateNumber>1666</StateNumber>
+    </table>
+    <column id="37" parent="34" name="version_num">
       <Position>1</Position>
       <DataType>varchar(32)|0s</DataType>
       <NotNull>1</NotNull>
       <StateNumber>1660</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <index id="34" parent="32" name="alembic_version_pkc">
+    <index id="38" parent="34" name="alembic_version_pkc">
       <ObjectId>29044</ObjectId>
       <StateNumber>1660</StateNumber>
       <ColNames>version_num</ColNames>
       <Unique>1</Unique>
       <Primary>1</Primary>
     </index>
-    <key id="35" parent="32" name="alembic_version_pkc">
+    <key id="39" parent="34" name="alembic_version_pkc">
       <ObjectId>29045</ObjectId>
       <StateNumber>1660</StateNumber>
       <ColNames>version_num</ColNames>
       <Primary>1</Primary>
       <UnderlyingIndexName>alembic_version_pkc</UnderlyingIndexName>
+    </key>
+    <column id="40" parent="35" name="id">
+      <Position>1</Position>
+      <DataType>integer|0s</DataType>
+      <NotNull>1</NotNull>
+      <StateNumber>1666</StateNumber>
+      <DefaultExpression>nextval(&apos;profiles_id_seq&apos;::regclass)</DefaultExpression>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="41" parent="35" name="user_id">
+      <Position>2</Position>
+      <DataType>integer|0s</DataType>
+      <StateNumber>1666</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="42" parent="35" name="name">
+      <Position>3</Position>
+      <DataType>varchar|0s</DataType>
+      <NotNull>1</NotNull>
+      <StateNumber>1666</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <index id="43" parent="35" name="profiles_pkey">
+      <ObjectId>29066</ObjectId>
+      <StateNumber>1666</StateNumber>
+      <ColNames>id</ColNames>
+      <Unique>1</Unique>
+      <Primary>1</Primary>
+    </index>
+    <key id="44" parent="35" name="profiles_pkey">
+      <ObjectId>29067</ObjectId>
+      <StateNumber>1666</StateNumber>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>profiles_pkey</UnderlyingIndexName>
+    </key>
+    <foreign-key id="45" parent="35" name="profiles_user_id_fkey">
+      <ObjectId>29068</ObjectId>
+      <StateNumber>1666</StateNumber>
+      <ColNames>user_id</ColNames>
+      <RefTableId>29048</RefTableId>
+      <RefColPositions>1</RefColPositions>
+      <RefTableName>users</RefTableName>
+      <RefKeyName>users_pkey</RefKeyName>
+      <RefColNames>id</RefColNames>
+    </foreign-key>
+    <column id="46" parent="36" name="id">
+      <Position>1</Position>
+      <DataType>integer|0s</DataType>
+      <NotNull>1</NotNull>
+      <StateNumber>1666</StateNumber>
+      <DefaultExpression>nextval(&apos;users_id_seq&apos;::regclass)</DefaultExpression>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="47" parent="36" name="email">
+      <Position>2</Position>
+      <DataType>varchar|0s</DataType>
+      <NotNull>1</NotNull>
+      <StateNumber>1666</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="48" parent="36" name="hashed_password">
+      <Position>3</Position>
+      <DataType>varchar|0s</DataType>
+      <NotNull>1</NotNull>
+      <StateNumber>1666</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <index id="49" parent="36" name="users_pkey">
+      <ObjectId>29055</ObjectId>
+      <StateNumber>1666</StateNumber>
+      <ColNames>id</ColNames>
+      <Unique>1</Unique>
+      <Primary>1</Primary>
+    </index>
+    <key id="50" parent="36" name="users_pkey">
+      <ObjectId>29056</ObjectId>
+      <StateNumber>1666</StateNumber>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>users_pkey</UnderlyingIndexName>
     </key>
   </database-model>
 </dataSource>

@@ -37,7 +37,7 @@ sys.path.append(current_dir)
 
 Finally, the last bit of "magic" applied is to ensure that the DB URL specified in the .env file is used during online migrations. This function can be found in ./alembic/env.py 
 
-##How The Apps Work
+## How The Apps Work
 
 This starter follows the same conventions as Django where apps are seperated into their own components for organization's sake. Each app inherits types from the utils/graphql folder which are then used to create mutations/queries.
 

@@ -3,7 +3,13 @@ type User{
     password: String!
 }
 
-input createUserInput{
+type ReturnUser{
+    email: String
+    status: String
+    authToken: String
+}
+
+input userAuthInput{
     email: String!
     password: String!
 }

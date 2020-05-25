@@ -2,8 +2,11 @@ from ariadne import make_executable_schema
 from ariadne.asgi import GraphQL
 from starlette.applications import Starlette
 from ariadne.contrib.tracing.apollotracing import ApolloTracingExtension
+from starlette.middleware import Middleware
+from starlette.middleware.authentication import AuthenticationMiddleware
 
 from backend.db import db as gino_db
+from backend.users.auth.verify_cookie import VerifyCookie
 
 # For debugging:
 import uvicorn
@@ -16,10 +19,13 @@ from backend.users import user_type_defs
 
 schema = make_executable_schema([*root_graphql_types, *user_type_defs], root_query, root_mutation)
 
-app = Starlette(debug=True)
+middleware = [
+    Middleware(AuthenticationMiddleware, backend=VerifyCookie())
+]
+
+app = Starlette(debug=True, middleware=middleware)
 gino_db.init_app(app)
 # load_modules(app)
-
 app.mount("/graphql", GraphQL(schema, debug=True, extensions=[ApolloTracingExtension]))
 
 # For debugging
@@ -28,3 +34,6 @@ if __name__ == "__main__":
 
 # TODO: Auth
 # https://spectrum.chat/ariadne/general/how-to-implement-a-very-simple-auth-layer~80b7d221-6d0c-4df8-800a-e4cc6a07c99d
+# Session middlewere
+
+# TODO: CORS middleware and more
