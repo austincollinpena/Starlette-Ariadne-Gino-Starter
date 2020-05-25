@@ -4,8 +4,11 @@ from starlette.applications import Starlette
 from ariadne.contrib.tracing.apollotracing import ApolloTracingExtension
 from starlette.middleware import Middleware
 from starlette.middleware.authentication import AuthenticationMiddleware
+from starlette_context import context, plugins
+from starlette_context.middleware import ContextMiddleware
 
 from backend.db import db as gino_db
+from backend import config
 from backend.users.auth.verify_cookie import VerifyCookie
 
 # For debugging:
@@ -17,10 +20,21 @@ from backend.utils.graphql.mutation_type import mutation as root_mutation
 from backend.utils.graphql import root_graphql_types
 from backend.users import user_type_defs
 
+from starlette_authlib.middleware import AuthlibMiddleware
+
 schema = make_executable_schema([*root_graphql_types, *user_type_defs], root_query, root_mutation)
 
+# TODO, just use the custom one
 middleware = [
-    Middleware(AuthenticationMiddleware, backend=VerifyCookie())
+    Middleware(AuthlibMiddleware, secret_key=str(config.SECRET_KEY)),
+    Middleware(AuthenticationMiddleware, backend=VerifyCookie()),
+    Middleware(
+        ContextMiddleware,
+        plugins=(
+            plugins.RequestIdPlugin(),
+            plugins.CorrelationIdPlugin()
+        )
+    )
 ]
 
 app = Starlette(debug=True, middleware=middleware)

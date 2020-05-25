@@ -155,7 +155,17 @@ Gino is a wrapper around SQLAlchemy core, allowing for asynchronous actions.
 
 TODO: ondelete=Cascade?
 
+## Authentication
+
+Still a lot to do here! One important note is that there are no refresh JWT's implemented yet. Will likely work based off of the frontend's requirement and [this guide](https://medium.com/@lucasmcgartland/refreshing-token-based-authentication-with-apollo-client-2-0-7d45c20dc703).
+
+
 ## Setting Up The environment
 
 1. Run a pip install
 2. Fill out the ```env``` file with variables included for convenience. Just change it from ```env``` to ```.env``` (This of course requires a postgres server up and running)
+
+## Other To Do:
+
+1. Add Redis
+2. Add ability to use background tasks

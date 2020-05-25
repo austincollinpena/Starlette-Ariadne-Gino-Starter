@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 import jwt
 from backend.config import SECRET_KEY
 
-
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -17,7 +16,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def encode_auth_token(user_id):
     try:
         payload = {
-            'exp': datetime.utcnow() + timedelta(days=0, seconds=5),
+            'exp': datetime.utcnow() + timedelta(days=1, seconds=5),
             'iat': datetime.utcnow(),
             'sub': user_id
         }
@@ -39,7 +38,7 @@ def decode_auth_token(auth_token):
     :return: integer|string
     """
     try:
-        payload = jwt.decode(auth_token, SECRET_KEY)
+        payload = jwt.decode(auth_token, str(SECRET_KEY))
         return payload['sub']
     except jwt.ExpiredSignatureError:
         return 'Signature expired. Please log in again.'
