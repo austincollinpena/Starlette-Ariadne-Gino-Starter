@@ -3,6 +3,7 @@ from starlette.config import Config
 from starlette.datastructures import Secret
 import os
 
+print('CWD-----------------------')
 print(os.getcwd())
 
 config = Config("backend/.env")
@@ -31,8 +32,6 @@ DB_DSN = config(
         database=DB_DATABASE,
     ),
 )
-print('IM THE DB_DSN')
-print(DB_DSN)
 DB_POOL_MIN_SIZE = config("DB_POOL_MIN_SIZE", cast=int, default=1)
 DB_POOL_MAX_SIZE = config("DB_POOL_MAX_SIZE", cast=int, default=16)
 DB_ECHO = config("DB_ECHO", cast=bool, default=False)

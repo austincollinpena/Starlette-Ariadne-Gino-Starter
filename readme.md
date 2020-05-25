@@ -136,4 +136,12 @@ modules = glob.glob(join(dirname(__file__), "*.py"))
 __all__ = [basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__init__.py')]
 ```
 
+## Using Gino
 
+Gino is a wrapper around SQLAlchemy core, allowing for asynchronous actions.
+
+1. Basic CRUD actions are [outline here](https://python-gino.org/docs/en/master/tutorials/tutorial.html#crud-operations). Full [API reference is here](https://python-gino.org/docs/en/master/reference/api/gino.crud.html).
+2. Instructions for setting up models [are here](https://python-gino.org/docs/en/master/how-to/schema.html#gino-core)
+3. Loading relationships via models loaders [are here](https://python-gino.org/docs/en/master/how-to/loaders.html).
+
+TODO: ondelete=Cascade?

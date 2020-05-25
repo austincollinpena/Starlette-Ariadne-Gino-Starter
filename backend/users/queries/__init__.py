@@ -1,8 +1,5 @@
-# Import the Graphql files and put them in a list
-import os
-
 from ariadne import load_schema_from_path
-
+from os import getcwd
 from os.path import dirname, basename, isfile, join
 import glob
 
@@ -12,5 +9,4 @@ __all__ = [basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__
 from backend.users.queries import *
 
 # Get all the typedefs
-user_query_schema = load_schema_from_path(
-    os.path.join(os.getcwd(), "backend/users/queries"))
+user_query_schema = load_schema_from_path(join(getcwd(), "backend/users/queries"))

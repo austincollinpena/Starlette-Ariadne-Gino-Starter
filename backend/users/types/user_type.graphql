@@ -2,3 +2,8 @@ type User{
     email: String!
     password: String!
 }
+
+input createUserInput{
+    email: String!
+    password: String!
+}

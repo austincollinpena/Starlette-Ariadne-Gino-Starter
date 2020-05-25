@@ -12,3 +12,4 @@ db = Gino(dsn=config.DB_DSN,
 
 # Import your models here so Alembic will pick them up
 from backend.users.models import *
+
