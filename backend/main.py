@@ -24,20 +24,7 @@ from starlette_authlib.middleware import AuthlibMiddleware
 
 schema = make_executable_schema([*root_graphql_types, *user_type_defs], root_query, root_mutation)
 
-# TODO, just use the custom one
-middleware = [
-    Middleware(AuthlibMiddleware, secret_key=str(config.SECRET_KEY)),
-    Middleware(AuthenticationMiddleware, backend=VerifyCookie()),
-    Middleware(
-        ContextMiddleware,
-        plugins=(
-            plugins.RequestIdPlugin(),
-            plugins.CorrelationIdPlugin()
-        )
-    )
-]
-
-app = Starlette(debug=True, middleware=middleware)
+app = Starlette(debug=True)
 gino_db.init_app(app)
 # load_modules(app)
 app.mount("/graphql", GraphQL(schema, debug=True, extensions=[ApolloTracingExtension]))
