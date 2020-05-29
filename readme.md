@@ -169,3 +169,48 @@ Still a lot to do here! One important note is that there are no refresh JWT's im
 
 1. Add Redis
 2. Add ability to use background tasks
+3. Add session based authentication
+
+
+https://spectrum.chat/ariadne/general/return-cookie-in-response-headers-based-on-response-content~37893ad2-f66a-43ca-9313-201be05e765d
+```python
+app.middleware("http")
+async def cookie_middleware(request: Request, call_next):
+# This function also experiments with allowing cookies to be set using data from the resolvers
+# that is stored in the request item
+response = Response("Internal server error", status_code=500)
+try:
+    request.state.response_cookies = False
+    request.state.response_tokens = None
+    response = await call_next(request)
+finally:
+    if request.state.response_cookies:
+        tokens = request.state.response_tokens
+        for token in tokens:
+            # Parse what kind of token it is
+            if token == "accessToken":
+                response.set_cookie(
+                    key="vidette-Authorization",
+                    value=tokens[token].decode("utf-8"),
+                    # expires=int(tokens[token][1]),
+                    expires=int(10),
+                    httponly=True,
+                )
+            if token == "refreshToken":
+                response.set_cookie(
+                    key="vidette-Refresh",
+                    value=tokens[token].decode("utf-8"),
+                    #expires=int(tokens[token][1]),
+                    expires=int(10),
+                    httponly=True
+                )
+            if token == "Data":
+                response.set_cookie(
+                    key="vidette-Data",
+                    value=tokens[token].decode("utf-8"),
+                    #expires=int(tokens[token][1]),
+                    expires=int(10),
+                    httponly=True
+                )
+return response
+```

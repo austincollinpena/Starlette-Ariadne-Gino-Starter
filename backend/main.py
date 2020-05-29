@@ -1,33 +1,51 @@
 from ariadne import make_executable_schema
 from ariadne.asgi import GraphQL
 from starlette.applications import Starlette
-from ariadne.contrib.tracing.apollotracing import ApolloTracingExtension
 from starlette.middleware import Middleware
-from starlette.middleware.authentication import AuthenticationMiddleware
-from starlette_context import context, plugins
-from starlette_context.middleware import ContextMiddleware
+from ariadne.contrib.tracing.apollotracing import ApolloTracingExtension
 
+# Local Packages
 from backend.db import db as gino_db
-from backend import config
-from backend.users.auth.verify_cookie import VerifyCookie
 
 # For debugging:
 import uvicorn
 
+# Type defs
 from backend.users.queries import user_query_schema
 from backend.utils.graphql.query_type import query as root_query
 from backend.utils.graphql.mutation_type import mutation as root_mutation
 from backend.utils.graphql import root_graphql_types
 from backend.users import user_type_defs
 
-from starlette_authlib.middleware import AuthlibMiddleware
+schema = make_executable_schema(
+    [*root_graphql_types, *user_type_defs], root_query, root_mutation)
 
-schema = make_executable_schema([*root_graphql_types, *user_type_defs], root_query, root_mutation)
+from starlette.background import BackgroundTask
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.requests import Request
+from starlette.responses import Response
 
-app = Starlette(debug=True)
+
+class BackgroundTaskMiddleware(BaseHTTPMiddleware):
+    async def dispatch(
+            self, request: Request, call_next: RequestResponseEndpoint
+    ) -> Response:
+        # Available as info.context["request"].state.background
+        request.state.background = BackgroundTask()
+        response = await call_next(request)
+        response.background = request.state.background
+        return response
+
+
+middleware = [
+    Middleware(BackgroundTaskMiddleware)
+]
+
+app = Starlette(debug=True, middleware=middleware)
 gino_db.init_app(app)
 # load_modules(app)
-app.mount("/graphql", GraphQL(schema, debug=True, extensions=[ApolloTracingExtension]))
+app.mount("/graphql", GraphQL(schema, debug=True,
+                              extensions=[ApolloTracingExtension]))
 
 # For debugging
 if __name__ == "__main__":
