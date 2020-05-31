@@ -8,10 +8,9 @@ from starlette.responses import JSONResponse
 @query.field("getUser")
 @check_authentication
 async def resolve_get_user(user, obj, info):
-    
     tasks = BackgroundTasks()
     tasks.add_task(testFunc)
-    return False
+    return True
 
 
 async def testFunc():
