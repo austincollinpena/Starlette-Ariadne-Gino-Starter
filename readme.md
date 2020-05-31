@@ -167,10 +167,13 @@ Still a lot to do here! One important note is that there are no refresh JWT's im
 
 ## Other To Do:
 
-1. Add Redis as [LRU Cache](https://redis.io/topics/lru-cache) perhaps with [aiocache](https://github.com/argaen/aiocache)
+1. Add Redis as [LRU Cache](https://redis.io/topics/lru-cache) perhaps with [aiocache](https://github.com/argaen/aiocache).
 2. Add ability to use background tasks
 3. Add session based authentication (Example Below)
 4. Solve N+1 Issues. [Link to Ruby package](https://engineering.universe.com/batching-a-powerful-way-to-solve-n-1-queries-every-rubyist-should-know-24e20c6e7b94), 
+5. Add stronger type hints
+6. Upgrade to Python 3.8
+7. Add docker config
 
 
 https://spectrum.chat/ariadne/general/return-cookie-in-response-headers-based-on-response-content~37893ad2-f66a-43ca-9313-201be05e765d
