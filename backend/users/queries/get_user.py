@@ -10,7 +10,7 @@ from backend.utils.decorators.check_authenticated import check_authentication
 @query.field("getUser")
 @check_authentication
 async def resolve_get_user(user, obj, info):
-    task = await BackgroundTasks()
+    task = BackgroundTasks()
     task.add_task(test_func)
     task.add_task(testing_func_two, "I work now")
     request = info.context["request"]

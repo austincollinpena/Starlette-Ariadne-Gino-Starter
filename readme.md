@@ -147,13 +147,27 @@ __all__ = [basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__
 
 ## Using Gino
 
-Gino is a wrapper around SQLAlchemy core, allowing for asynchronous actions.
+Gino is a wrapper around SQLAlchemy core, allowing for asynchronous actions. Because of how relationships are built, I have not found any instances of N+1 Query problems. If you are able to find any, please raise an issue.
 
 1. Basic CRUD actions are [outline here](https://python-gino.org/docs/en/master/tutorials/tutorial.html#crud-operations). Full [API reference is here](https://python-gino.org/docs/en/master/reference/api/gino.crud.html).
 2. Instructions for setting up models [are here](https://python-gino.org/docs/en/master/how-to/schema.html#gino-core)
 3. Loading relationships via models loaders [are here](https://python-gino.org/docs/en/master/how-to/loaders.html).
 
 TODO: ondelete=Cascade?
+
+## Background Tasks
+
+There is background task middleware which allows you to add background tasks like so, no Celery needed!
+
+```python
+async def resolve_get_user(user, obj, info):
+    task = BackgroundTasks()
+    task.add_task(test_func)
+    task.add_task(testing_func_two, "I work now")
+    request = info.context["request"]
+    request.state.background = task
+    return True
+```
 
 ## Authentication
 
@@ -169,11 +183,10 @@ Still a lot to do here! One important note is that there are no refresh JWT's im
 
 1. Add Redis as [LRU Cache](https://redis.io/topics/lru-cache) perhaps with [aiocache](https://github.com/argaen/aiocache).
 2. Add ability to use background tasks
-3. Add session based authentication (Example Below)
-4. Solve N+1 Issues. [Link to Ruby package](https://engineering.universe.com/batching-a-powerful-way-to-solve-n-1-queries-every-rubyist-should-know-24e20c6e7b94), 
-5. Add stronger type hints
-6. Upgrade to Python 3.8
-7. Add docker config
+3. Add stronger type hints
+4. Upgrade to Python 3.8
+5. Add docker config
+6. Integrate a _maintained_ Python Redis driver
 
 
 https://spectrum.chat/ariadne/general/return-cookie-in-response-headers-based-on-response-content~37893ad2-f66a-43ca-9313-201be05e765d
