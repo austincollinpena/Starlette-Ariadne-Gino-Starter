@@ -30,10 +30,10 @@ class BackgroundTaskMiddleware(BaseHTTPMiddleware):
     async def dispatch(
             self, request: Request, call_next: RequestResponseEndpoint
     ) -> Response:
-        # Available as info.context["request"].state.background
-        request.state.background = BackgroundTask()
+        request.state.background = None
         response = await call_next(request)
-        response.background = request.state.background
+        if request.state.background:
+            response.background = request.state.background
         return response
 
 
@@ -43,6 +43,7 @@ middleware = [
 
 app = Starlette(debug=True, middleware=middleware)
 gino_db.init_app(app)
+
 # load_modules(app)
 app.mount("/graphql", GraphQL(schema, debug=True,
                               extensions=[ApolloTracingExtension]))
